@@ -39,10 +39,6 @@ All infrastructure is defined using **Terraform**. This ensures that the entire 
 - **Terraform** – Infrastructure as Code (DevOps / IaC)
 - **Python / Node.js** – Lambda + data generation
 
-## Project Structure
-
-<pre> ```bash Data-Analytics-Dashboard/ ├── terraform/ # Infrastructure as Code │ ├── main.tf │ ├── outputs.tf │ └── variables.tf │ ├── lambda/ # AWS Lambda for API │ └── stock_api_lambda.py │ ├── data-generator/ # Simulated stock price generator │ ├── generate.py │ └── stock CSVs/ │ ├── frontend/ # React + Plotly dashboard │ ├── src/ │ │ ├── components/ │ │ │ ├── SymbolDropdown.js │ │ │ └── PriceChart.js │ │ └── App.js │ └── public/ │ ├── .gitignore └── README.md ``` </pre>
-
 # Dashboard Demo (Basic version)
 ![Screenshot](./images/StockDash.png)
 
