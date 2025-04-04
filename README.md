@@ -2,43 +2,79 @@
 
 ## Overview
 
-The goal of this project is to build a lightweight, scalable pipeline to handle incoming stock data, transform it, and display it live on an interactive dashboard.
+The goal of this project is to build a fully serverless, cloud-native analytics system for streaming stock data — built with AWS, React, and Plotly.  
 
-This project simulates a real-time stock analytics system using serverless AWS infrastructure and a custom-built frontend. It demonstrates cloud-native ingestion, processing, and visualization of streaming data, all deployed and managed with Infrastructure as Code.
+This project simulates a real-time stock analytics system using modern serverless architecture and an interactive frontend dashboard.
 
 ## Architecture Summary
+
+Using a custom data generator, I stream historical stock data through **AWS Kinesis**, process it with **AWS Lambda**, store it in **DynamoDB**, and expose it using **API Gateway** to a **React + Plotly** dashboard.
+
+All infrastructure is defined using **Terraform**. This ensures that the entire stack is reproducible and scalable.
 
 **Ingestion → Processing → Storage → Visualization**
 
 - **Ingestion:**  
-  A data generator sends events to **AWS Kinesis**.
+  Simulated data is streamed to **Amazon Kinesis**.
 
 - **Processing:**  
-  **AWS Lambda** functions process the incoming stream data.
+  A **Lambda** function parses each record and stores it in **DynamoDB**.
 
 - **Storage:**  
-  Store the clean data in **DynamoDB** for fast operational queries.
+  **DynamoDB** holds the data indexed by symbol and date for low-latency queries.
+
+- **API:**  
+  **Amazon API Gateway** exposes a RESTful endpoint for querying symbol-specific data.
 
 - **Visualization:**  
-  A **React** dashboard uses react and D3.js for real-time visualizations. 
-
+  A **React** dashboard displays real-time charts using **Plotly.js** and `axios`.
 
 ## Tools & Technologies
 
-- **AWS Lambda** – Real-time processing
+- **AWS Lambda** – Real-time processing & Cloud compute
 - **Amazon Kinesis** – Streaming ingestion
-- **Amazon DynamoDB** – NoSQL data store
-- **Amazon API Gateway** – Serve data to frontend
-- **React + D3.js** – Interactive dashboard
-- **Terraform** – Infrastructure as Code
+- **Amazon DynamoDB** – data store
+- **Amazon API Gateway** – Serve data to frontend (API layer)
+- **React + Plotly.js** – Interactive dashboard
+- **Terraform** – Infrastructure as Code (DevOps / IaC)
 - **Python / Node.js** – Lambda + data generation
-
-## Dashboard
 
 ## Project Structure
 
+Data-Analytics-Dashboard/
+├── terraform/                  
+│   ├── main.tf
+│   ├── outputs.tf
+│   └── variables.tf
+│
+├── lambda/                     
+│   └── stock_api_lambda.py
+│
+├── data-generator/              
+│   ├── generate.py
+│   └── stock CSVs
+│
+├── frontend/                   
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── SymbolDropdown.js
+│   │   │   └── PriceChart.js
+│   │   └── App.js
+│   └── public/
+│
+├── .gitignore
+└── README.md
 
+# Dashboard Demo (Basic version)
+![Screenshot](./images/StockDash.png)
 
+## Future Improvements (Pending...)
+
+- **Candlestick Charts:**  
+  Upgrade to interactive OHLC candlestick visualizations.
+
+- **Historical + Real-Time Hybrid Mode:**  
+  Merge historical stock data with actual live market feeds.
 
 
 
