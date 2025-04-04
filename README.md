@@ -41,7 +41,7 @@ All infrastructure is defined using **Terraform**. This ensures that the entire 
 
 ## Project Structure
 
-<pre> Data-Analytics-Dashboard/ ├── terraform/ # Infrastructure as Code │ ├── main.tf │ ├── outputs.tf │ └── variables.tf │ ├── lambda/ # AWS Lambda function for API │ └── stock_api_lambda.py │ ├── data-generator/ # Simulated stock price generator │ ├── generate.py │ └── stock CSVs/ │ ├── frontend/ # React + Plotly dashboard │ ├── src/ │ │ ├── components/ │ │ │ ├── SymbolDropdown.js │ │ │ └── PriceChart.js │ │ └── App.js │ └── public/ │ ├── .gitignore └── README.md </pre>
+<pre> ```bash Data-Analytics-Dashboard/ ├── terraform/ # Infrastructure as Code │ ├── main.tf │ ├── outputs.tf │ └── variables.tf │ ├── lambda/ # AWS Lambda for API │ └── stock_api_lambda.py │ ├── data-generator/ # Simulated stock price generator │ ├── generate.py │ └── stock CSVs/ │ ├── frontend/ # React + Plotly dashboard │ ├── src/ │ │ ├── components/ │ │ │ ├── SymbolDropdown.js │ │ │ └── PriceChart.js │ │ └── App.js │ └── public/ │ ├── .gitignore └── README.md ``` </pre>
 
 # Dashboard Demo (Basic version)
 ![Screenshot](./images/StockDash.png)
