@@ -6,7 +6,7 @@ variable "region" {
   default = "us-east-2"
 }
 
-# --- Kinesis Stream ---
+# Kinesis Stream 
 resource "aws_kinesis_stream" "stock_stream" {
   name             = "stock-data-stream"
   shard_count      = 1
@@ -22,7 +22,7 @@ resource "aws_kinesis_stream" "stock_stream" {
   }
 }
 
-# --- DynamoDB Table ---
+# DynamoDB Table
 resource "aws_dynamodb_table" "stock_table" {
   name         = "stock-data-table"
   billing_mode = "PAY_PER_REQUEST"
@@ -45,7 +45,7 @@ resource "aws_dynamodb_table" "stock_table" {
   }
 }
 
-# --- IAM Role for Lambda ---
+# IAM Role for Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-stock-role"
 
@@ -62,14 +62,13 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
-# --- Attach Basic Lambda Execution Role ---
+# IAM Policies
 resource "aws_iam_policy_attachment" "lambda_basic_execution" {
   name       = "lambda-basic-execution"
   roles      = [aws_iam_role.lambda_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# --- Attach Kinesis and DynamoDB Access Policies ---
 resource "aws_iam_policy_attachment" "lambda_kinesis_access" {
   name       = "lambda-kinesis-access"
   roles      = [aws_iam_role.lambda_role.name]
@@ -82,6 +81,7 @@ resource "aws_iam_policy_attachment" "lambda_dynamo_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
 
+# Lambda Function
 resource "aws_lambda_function" "stock_api_lambda" {
   filename         = "${path.module}/../lambda/stock_api_lambda.zip"
   function_name    = "stock-api-lambda"
@@ -97,6 +97,7 @@ resource "aws_lambda_function" "stock_api_lambda" {
   }
 }
 
+# API Gateway
 resource "aws_api_gateway_rest_api" "stock_api" {
   name        = "StockDataAPI"
   description = "API for querying stock data from DynamoDB"
@@ -132,60 +133,10 @@ resource "aws_lambda_permission" "allow_api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.stock_api.execution_arn}/*/*"
 }
 
-resource "aws_lambda_function" "get_symbols_lambda" {
-  function_name = "get-symbols-lambda"
-  handler       = "get_symbols_lambda.lambda_handler"
-  runtime       = "python3.9"
-  role          = aws_iam_role.lambda_role.arn
-  filename      = "./../lambda/get_symbols_lambda.zip"
-  source_code_hash = filebase64sha256("./../lambda/get_symbols_lambda.zip")
-  timeout       = 15
-
-  environment {
-    variables = {
-      TABLE_NAME = aws_dynamodb_table.stock_table.name
-    }
-  }
-}
-
-resource "aws_api_gateway_resource" "symbols_resource" {
-  rest_api_id = aws_api_gateway_rest_api.stock_api.id
-  parent_id   = aws_api_gateway_rest_api.stock_api.root_resource_id
-  path_part   = "symbols"
-}
-
-resource "aws_api_gateway_method" "get_symbols" {
-  rest_api_id   = aws_api_gateway_rest_api.stock_api.id
-  resource_id   = aws_api_gateway_resource.symbols_resource.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "get_symbols_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.stock_api.id
-  resource_id             = aws_api_gateway_resource.symbols_resource.id
-  http_method             = aws_api_gateway_method.get_symbols.http_method
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.get_symbols_lambda.invoke_arn
-}
-
-resource "aws_lambda_permission" "allow_get_symbols" {
-  statement_id  = "AllowExecutionFromAPIGatewaySymbols"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_symbols_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.stock_api.execution_arn}/*/*"
-}
-
 resource "aws_api_gateway_deployment" "api_deployment" {
-  rest_api_id = aws_api_gateway_rest_api.stock_api.id
-  stage_name  = "prod"
-
-  depends_on = [
-    aws_api_gateway_integration.lambda_integration,
-    aws_api_gateway_integration.get_symbols_integration
-  ]
+  depends_on   = [aws_api_gateway_integration.lambda_integration]
+  rest_api_id  = aws_api_gateway_rest_api.stock_api.id
+  stage_name   = "prod"
 }
 
 # --- Outputs ---
