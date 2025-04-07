@@ -132,12 +132,6 @@ resource "aws_lambda_permission" "allow_api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.stock_api.execution_arn}/*/*"
 }
 
-resource "aws_api_gateway_deployment" "api_deployment" {
-  depends_on = [aws_api_gateway_integration.lambda_integration]
-  rest_api_id = aws_api_gateway_rest_api.stock_api.id
-  stage_name = "prod"
-}
-
 resource "aws_lambda_function" "get_symbols_lambda" {
   function_name = "get-symbols-lambda"
   handler       = "get_symbols_lambda.lambda_handler"
@@ -181,6 +175,16 @@ resource "aws_lambda_permission" "allow_get_symbols" {
   function_name = aws_lambda_function.get_symbols_lambda.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.stock_api.execution_arn}/*/*"
+}
+
+resource "aws_api_gateway_deployment" "api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.stock_api.id
+  stage_name  = "prod"
+
+  depends_on = [
+    aws_api_gateway_integration.lambda_integration,
+    aws_api_gateway_integration.get_symbols_integration
+  ]
 }
 
 # --- Outputs ---
