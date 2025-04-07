@@ -2,10 +2,10 @@ import pandas as pd
 import os
 
 folder_path = './stocks' 
-output_file = 'combined_stock_data.csv'
+output_file = '20_combined_stock_data.csv'
 
 combined_df = pd.DataFrame()
-max_files = 10  
+max_files = 20
 
 for i, filename in enumerate(os.listdir(folder_path)):
     if filename.endswith('.csv') and i < max_files:

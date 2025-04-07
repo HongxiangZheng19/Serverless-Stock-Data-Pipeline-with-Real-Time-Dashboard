@@ -138,6 +138,51 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   stage_name = "prod"
 }
 
+resource "aws_lambda_function" "get_symbols_lambda" {
+  function_name = "get-symbols-lambda"
+  handler       = "get_symbols_lambda.lambda_handler"
+  runtime       = "python3.9"
+  role          = aws_iam_role.lambda_role.arn
+  filename      = "./../lambda/get_symbols_lambda.zip"
+  source_code_hash = filebase64sha256("./../lambda/get_symbols_lambda.zip")
+
+  environment {
+    variables = {
+      TABLE_NAME = aws_dynamodb_table.stock_table.name
+    }
+  }
+}
+
+resource "aws_api_gateway_resource" "symbols_resource" {
+  rest_api_id = aws_api_gateway_rest_api.stock_api.id
+  parent_id   = aws_api_gateway_rest_api.stock_api.root_resource_id
+  path_part   = "symbols"
+}
+
+resource "aws_api_gateway_method" "get_symbols" {
+  rest_api_id   = aws_api_gateway_rest_api.stock_api.id
+  resource_id   = aws_api_gateway_resource.symbols_resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "get_symbols_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.stock_api.id
+  resource_id             = aws_api_gateway_resource.symbols_resource.id
+  http_method             = aws_api_gateway_method.get_symbols.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.get_symbols_lambda.invoke_arn
+}
+
+resource "aws_lambda_permission" "allow_get_symbols" {
+  statement_id  = "AllowExecutionFromAPIGatewaySymbols"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_symbols_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.stock_api.execution_arn}/*/*"
+}
+
 # --- Outputs ---
 output "kinesis_stream_name" {
   value = aws_kinesis_stream.stock_stream.name

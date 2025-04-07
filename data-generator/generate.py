@@ -5,8 +5,8 @@ import boto3
 import signal
 import sys
 
-CSV_FILE = "combined_stock_data.csv"
-DELAY = 0.5
+CSV_FILE = "20_combined_stock_data.csv"
+DELAY = 0.10
 KINESIS_STREAM_NAME = "stock-data-stream"
 
 should_run = True

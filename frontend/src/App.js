@@ -4,22 +4,18 @@ import Select from "react-select";
 import Plot from "react-plotly.js";
 import "./App.css";
 
+
+
 const API_URL = "https://4ojyncmvuf.execute-api.us-east-2.amazonaws.com/prod";
 
-
-const options = [
-  { value: "CSCO", label: "Cisco Systems (CSCO)" },
-  { value: "NZF", label: "Nuveen Municipal Credit Income Fund (NZF)" },
-  { value: "ANTE", label: "AirNet Technology (ANTE)" },
-  { value: "SBGI", label: "Sinclair Broadcast Group (SBGI)" },
-  { value: "PRI", label: "Primerica Inc (PRI)" },
-];
 
 
 function App() {
   const [selectedSymbol, setSelectedSymbol] = useState(null);
   const [stockData, setStockData] = useState([]);
+  const [symbolOptions, setSymbolOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
 
   const fetchData = async (symbol) => {
     try {
@@ -33,6 +29,23 @@ function App() {
       setIsLoading(false);
     }
   };
+
+  const fetchSymbols = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/symbols`);
+      const opts = res.data.map((sym) => ({
+        value: sym,
+        label: `${sym} (${sym})`,
+      }));
+      setSymbolOptions(opts);
+    } catch (err) {
+      console.error("Error fetching symbols:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSymbols();
+  }, []);
 
   useEffect(() => {
     if (selectedSymbol) {
@@ -54,10 +67,10 @@ function App() {
       </p>
 
       <Select
-        options={options}
+        options={symbolOptions}
         value={selectedSymbol}
         onChange={setSelectedSymbol}
-        placeholder="Select a symbol"
+        placeholder="Select a stock symbol"
         styles={{
           container: (base) => ({ ...base, marginBottom: "2rem" }),
           control: (base) => ({ ...base, borderColor: "#ccc", boxShadow: "none" }),
