@@ -139,6 +139,7 @@ resource "aws_lambda_function" "get_symbols_lambda" {
   role          = aws_iam_role.lambda_role.arn
   filename      = "./../lambda/get_symbols_lambda.zip"
   source_code_hash = filebase64sha256("./../lambda/get_symbols_lambda.zip")
+  timeout       = 15
 
   environment {
     variables = {

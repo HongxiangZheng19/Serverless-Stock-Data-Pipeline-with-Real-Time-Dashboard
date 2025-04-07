@@ -4,18 +4,35 @@ import Select from "react-select";
 import Plot from "react-plotly.js";
 import "./App.css";
 
-
-
 const API_URL = "https://4ojyncmvuf.execute-api.us-east-2.amazonaws.com/prod";
 
-
+const options = [
+  { value: "AIRT", label: "AIRT (AIRT)" },
+  { value: "ANTE", label: "ANTE (ANTE)" },
+  { value: "BNY", label: "BNY (BNY)" },
+  { value: "CSCO", label: "CSCO (CSCO)" },
+  { value: "GFED", label: "GFED (GFED)" },
+  { value: "GPL", label: "GPL (GPL)" },
+  { value: "HLNE", label: "HLNE (HLNE)" },
+  { value: "HUBS", label: "HUBS (HUBS)" },
+  { value: "ISSC", label: "ISSC (ISSC)" },
+  { value: "NXN", label: "NXN (NXN)" },
+  { value: "NZF", label: "NZF (NZF)" },
+  { value: "PRI", label: "PRI (PRI)" },
+  { value: "RHE", label: "RHE (RHE)" },
+  { value: "RIV", label: "RIV (RIV)" },
+  { value: "RJZ", label: "RJZ (RJZ)" },
+  { value: "SBGI", label: "SBGI (SBGI)" },
+  { value: "SITC", label: "SITC (SITC)" },
+  { value: "TEAF", label: "TEAF (TEAF)" },
+  { value: "UFCS", label: "UFCS (UFCS)" },
+  { value: "UNT", label: "UNT (UNT)" }
+];
 
 function App() {
   const [selectedSymbol, setSelectedSymbol] = useState(null);
   const [stockData, setStockData] = useState([]);
-  const [symbolOptions, setSymbolOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
 
   const fetchData = async (symbol) => {
     try {
@@ -29,23 +46,6 @@ function App() {
       setIsLoading(false);
     }
   };
-
-  const fetchSymbols = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/symbols`);
-      const opts = res.data.map((sym) => ({
-        value: sym,
-        label: `${sym} (${sym})`,
-      }));
-      setSymbolOptions(opts);
-    } catch (err) {
-      console.error("Error fetching symbols:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchSymbols();
-  }, []);
 
   useEffect(() => {
     if (selectedSymbol) {
@@ -67,7 +67,7 @@ function App() {
       </p>
 
       <Select
-        options={symbolOptions}
+        options={options}
         value={selectedSymbol}
         onChange={setSelectedSymbol}
         placeholder="Select a stock symbol"

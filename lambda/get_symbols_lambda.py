@@ -11,7 +11,14 @@ def lambda_handler(event, context):
         symbols = []
 
         response = table.scan()
-        for item in response.get("Items", []):
+        items = response.get("Items", [])
+
+        # Paginate
+        while "LastEvaluatedKey" in response:
+            response = table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
+            items.extend(response.get("Items", []))
+
+        for item in items:
             symbol = item.get("symbol")
             if symbol and symbol not in seen:
                 seen.add(symbol)
@@ -19,23 +26,19 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
+            "body": json.dumps(sorted(symbols)),
             "headers": {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET",
-                "Access-Control-Allow-Headers": "*"
-            },
-            "body": json.dumps(sorted(symbols))
+                "Access-Control-Allow-Origin": "*"
+            }
         }
 
     except Exception as e:
         return {
             "statusCode": 500,
+            "body": json.dumps({"error": str(e)}),
             "headers": {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET",
-                "Access-Control-Allow-Headers": "*"
-            },
-            "body": json.dumps({"error": str(e)})
+                "Access-Control-Allow-Origin": "*"
+            }
         }
