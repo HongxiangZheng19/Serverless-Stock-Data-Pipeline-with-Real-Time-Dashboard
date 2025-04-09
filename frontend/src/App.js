@@ -177,30 +177,23 @@ function App() {
             data={[
               {
                 x: realTimeData.map((d) => d.date),
-                y: realTimeData.map((d) => parseFloat(d.open)),
-                type: "scatter",
-                mode: "lines+markers",
-                name: "Open Price",
-                line: { color: "green" },
-              },
-              {
-                x: realTimeData.map((d) => d.date),
                 y: realTimeData.map((d) => parseFloat(d.close)),
                 type: "scatter",
                 mode: "lines+markers",
-                name: "Close Price",
-                line: { color: "red" },
+                name: "Real-Time Price",
+                line: { color: "#00cc96" },
+                hovertemplate: "Price: $%{y:.2f}<br>Time: %{x}<extra></extra>",
               },
             ]}
             layout={{
-              title: `${realTimeSymbol?.label} Real-Time Prices`,
-              xaxis: { title: "Date" },
+              title: `${realTimeSymbol?.label} Real-Time Price (5-min interval)`,
+              xaxis: { title: "Timestamp", tickformat: "%H:%M\n%b %d" },
               yaxis: { title: "Price (USD)" },
               autosize: true,
               margin: { t: 50, b: 50 },
             }}
             style={{ width: "100%", height: "100%" }}
-          />
+          />        
         ) : (
           <p style={{ color: "#999" }}>No real-time data to show.</p>
         )}
