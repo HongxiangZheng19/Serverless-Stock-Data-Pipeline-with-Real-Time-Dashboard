@@ -1,9 +1,7 @@
+# terraform apply -var-file=".env.tfvars"
+
 provider "aws" {
   region = var.region
-}
-
-variable "region" {
-  default = "us-east-2"
 }
 
 # Kinesis Stream 
@@ -95,6 +93,48 @@ resource "aws_lambda_function" "stock_api_lambda" {
       TABLE_NAME = aws_dynamodb_table.stock_table.name
     }
   }
+}
+
+resource "aws_lambda_function" "live_fetch_lambda" {
+  filename         = "${path.module}/../lambda/live_fetch_lambda.zip"
+  function_name    = "live-fetch-lambda"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "live_fetch_lambda.lambda_handler"  
+  runtime          = "python3.9"
+  timeout          = 30
+  source_code_hash = filebase64sha256("${path.module}/../lambda/live_fetch_lambda.zip")
+
+  environment {
+    variables = {
+      KINESIS_STREAM_NAME = aws_kinesis_stream.stock_stream.name
+      FINNHUB_API_KEY     = var.finnhub_api_key
+    }
+  }
+}
+
+# Scheduled Lambda Trigger (EventBridge)
+# EventBridge Schedule Rule (every 5 minutes)
+resource "aws_cloudwatch_event_rule" "five_min_schedule" {
+  name                = "every-5-mins"
+  schedule_expression = "rate(5 minutes)"
+  description         = "Triggers live stock data fetch Lambda every 5 minutes"
+  is_enabled          = var.enable_schedule
+}
+
+# EventBridge Target → Lambda
+resource "aws_cloudwatch_event_target" "trigger_live_fetch" {
+  rule      = aws_cloudwatch_event_rule.five_min_schedule.name
+  target_id = "live-fetch-lambda-trigger"
+  arn       = aws_lambda_function.live_fetch_lambda.arn
+}
+
+# Invoke Lambda
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.live_fetch_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.five_min_schedule.arn
 }
 
 # API Gateway

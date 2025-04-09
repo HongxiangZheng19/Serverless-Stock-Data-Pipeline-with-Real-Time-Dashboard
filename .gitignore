@@ -1,3 +1,7 @@
 *.csv
 *.zip
 .terraform/
+.env.tfvars
+*.tfvars
+*.tfvars.json
+

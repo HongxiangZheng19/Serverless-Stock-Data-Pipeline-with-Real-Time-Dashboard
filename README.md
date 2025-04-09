@@ -47,8 +47,6 @@ All infrastructure is defined using **Terraform**. This ensures that the entire 
 - **Candlestick Charts:**  
   Upgrade to interactive OHLC candlestick visualizations.
 
-- **Historical + Real-Time Hybrid Mode:**  
-  Merge historical stock data with actual live market feeds.
 
 
 
