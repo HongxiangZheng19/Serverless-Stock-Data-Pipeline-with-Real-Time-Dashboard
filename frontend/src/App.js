@@ -6,7 +6,7 @@ import "./App.css";
 
 const API_URL = "https://4ojyncmvuf.execute-api.us-east-2.amazonaws.com/prod";
 
-const options = [
+const historicalOptions = [
   { value: "AIRT", label: "AIRT (Air T Inc)" },
   { value: "ANTE", label: "ANTE (AirNet Technology Inc)" },
   { value: "BNY", label: "BNY (BlackRock New York Municipal Income Trust)" },
