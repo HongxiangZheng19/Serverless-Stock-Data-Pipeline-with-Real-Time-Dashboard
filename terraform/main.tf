@@ -87,6 +87,8 @@ resource "aws_lambda_function" "stock_api_lambda" {
   handler          = "stock_api_lambda.lambda_handler"
   runtime          = "python3.9"
   source_code_hash = filebase64sha256("${path.module}/../lambda/stock_api_lambda.zip")
+  timeout          = 30  
+  memory_size      = 256  
 
   environment {
     variables = {

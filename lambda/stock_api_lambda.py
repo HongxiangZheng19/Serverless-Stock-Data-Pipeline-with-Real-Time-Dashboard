@@ -7,6 +7,19 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ.get("TABLE_NAME", "stock-data-table"))
 
 def lambda_handler(event, context):
+    method = event.get("httpMethod", "")
+
+    if method == "OPTIONS":
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "GET,OPTIONS"
+            },
+            "body": json.dumps("CORS preflight successful")
+        }
+
     symbol = event.get("queryStringParameters", {}).get("symbol", "")
     if not symbol:
         return {
@@ -14,7 +27,7 @@ def lambda_handler(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "GET"
+                "Access-Control-Allow-Methods": "GET,OPTIONS"
             },
             "body": json.dumps({"error": "Missing symbol"})
         }
@@ -30,7 +43,7 @@ def lambda_handler(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "GET"
+                "Access-Control-Allow-Methods": "GET,OPTIONS"
             },
             "body": json.dumps(items)
         }
@@ -41,7 +54,7 @@ def lambda_handler(event, context):
             "headers": {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "GET"
+                "Access-Control-Allow-Methods": "GET,OPTIONS"
             },
             "body": json.dumps({"error": str(e)})
         }
