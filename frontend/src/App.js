@@ -1,7 +1,7 @@
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import Plot from "react-plotly.js";
-import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 const API_URL = "https://4ojyncmvuf.execute-api.us-east-2.amazonaws.com/prod";
@@ -38,22 +38,6 @@ const realTimeOptions = [
 ];
 
 function App() {
-  const historicalLayoutRef = useRef({
-    title: "",
-    xaxis: { title: "Date" },
-    yaxis: { title: "Price (USD)" },
-    autosize: true,
-    margin: { t: 50, b: 50 }
-  });
-  
-  const realTimeLayoutRef = useRef({
-    title: "",
-    xaxis: { title: "Timestamp", tickformat: "%H:%M\n%b %d" },
-    yaxis: { title: "Price (USD)" },
-    autosize: true,
-    margin: { t: 50, b: 50 }
-  });
-  
   // Historical
   const [selectedSymbol, setSelectedSymbol] = useState(null);
   const [stockData, setStockData] = useState([]);
@@ -161,13 +145,12 @@ function App() {
               },
             ]}
             layout={{
-              ...historicalLayoutRef.current,
               title: `${selectedSymbol?.label} Historical Prices`,
+              xaxis: { title: "Date" },
+              yaxis: { title: "Price (USD)" },
+              autosize: true,
+              margin: { t: 50, b: 50 },
             }}
-            onRelayout={(layout) => {
-              historicalLayoutRef.current = { ...historicalLayoutRef.current, ...layout };
-            }}
-            config={{ responsive: true }}
             style={{ width: "100%", height: "100%" }}
           />
         ) : (
@@ -203,15 +186,14 @@ function App() {
               },
             ]}
             layout={{
-              ...realTimeLayoutRef.current,
               title: `${realTimeSymbol?.label} Real-Time Price (5-min interval)`,
+              xaxis: { title: "Timestamp", tickformat: "%H:%M\n%b %d" },
+              yaxis: { title: "Price (USD)" },
+              autosize: true,
+              margin: { t: 50, b: 50 },
             }}
-            onRelayout={(layout) => {
-              realTimeLayoutRef.current = { ...realTimeLayoutRef.current, ...layout };
-            }}
-            config={{ responsive: true }}
             style={{ width: "100%", height: "100%" }}
-          />                
+          />        
         ) : (
           <p style={{ color: "#999" }}>No real-time data to show.</p>
         )}
