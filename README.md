@@ -57,6 +57,9 @@ All infrastructure is defined using **Terraform**. This ensures that the entire 
 ![Screenshot](./images/historicalstock1.png)
 ![Screenshot](./images/realtimestock1.png)
 
+## Known Issues
+- React is Re-rendering the Plot Component, causing problems with the built-in plotly tools 
+
 ## Future Improvements (Pending...)
 
 - **Candlestick Charts:**  
