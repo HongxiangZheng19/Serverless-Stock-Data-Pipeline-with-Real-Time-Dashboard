@@ -160,7 +160,7 @@ function App() {
 
       {/* Real-Time Section */}
       <section>
-        <h2>Real-Time Data (Updates every 5 mins (I turned it off for now :D))</h2>
+        <h2>Real-Time Data (Updates every 5 mins)</h2>
         <Select
           options={realTimeOptions}
           value={realTimeSymbol}
